@@ -1,0 +1,91 @@
+.App {
+  text-align: center;
+}
+
+.header {
+  background-color: #d4f1f9;
+  padding: 20px;
+}
+
+.title {
+  margin: 0;
+  color: #333;
+}
+
+.search {
+  margin-top: 20px;
+}
+
+.search input {
+  padding: 5px 10px;
+  font-size: 16px;
+}
+
+.search button {
+  padding: 5px 10px;
+  font-size: 16px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.block {
+  margin-top: 20px;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.city-details {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.weather-icon {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+.weather-temp {
+  font-size: 24px;
+  margin-left: 10px;
+}
+
+.weather-map {
+  margin-top: 20px;
+}
+
+.weather-forecast-horizontal {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.forecast-item {
+  margin-bottom: 20px;
+}
+
+.forecast-info {
+  display: flex;
+  align-items: center;
+}
+
+.weather-icon-small {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.footer {
+  background-color: #d4f1f9;
+  padding: 10px;
+  margin-top: 20px;
+  color: #333;
+}

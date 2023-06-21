@@ -1,0 +1,152 @@
+//const API_KEY = '59a629302419a2f5872661a20156788c';
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+  const [city, setCity] = useState('');
+  const [weatherData, setWeatherData] = useState(null);
+  const [forecastData, setForecastData] = useState(null);
+
+  const API_KEY = '59a629302419a2f5872661a20156788c';
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+      );
+      const data = await response.json();
+      setWeatherData(data);
+
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`
+      );
+      const forecastData = await forecastResponse.json();
+      setForecastData(forecastData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getDayOfWeek = (timestamp) => {
+    const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const date = new Date(timestamp * 1000);
+    return daysOfWeek[date.getDay()];
+  };
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const getFutureDaysForecast = () => {
+    if (forecastData && forecastData.list) {
+      const forecastList = forecastData.list;
+      const futureDaysForecast = {};
+
+      forecastList.forEach((forecast) => {
+        const forecastDate = new Date(forecast.dt * 1000);
+        const forecastDay = forecastDate.getDate();
+        const forecastMonth = forecastDate.getMonth();
+        const forecastYear = forecastDate.getFullYear();
+
+        if (!futureDaysForecast[`${forecastDay}-${forecastMonth}-${forecastYear}`]) {
+          futureDaysForecast[`${forecastDay}-${forecastMonth}-${forecastYear}`] = forecast;
+        } else {
+          const existingForecast = futureDaysForecast[`${forecastDay}-${forecastMonth}-${forecastYear}`];
+          if (forecast.main.temp_min < existingForecast.main.temp_min) {
+            existingForecast.main.temp_min = forecast.main.temp_min;
+          }
+          if (forecast.main.temp_max > existingForecast.main.temp_max) {
+            existingForecast.main.temp_max = forecast.main.temp_max;
+          }
+        }
+      });
+
+      return Object.values(futureDaysForecast);
+    }
+
+    return [];
+  };
+
+  return (
+    <div className="App">
+      <div className="header">
+        <h1 className="title">Meteorología para tus viajes</h1>
+        <div className="search">
+          <input
+            type="text"
+            placeholder="Ingrese el nombre de la ciudad"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+          <button onClick={handleSearch}>Buscar</button>
+        </div>
+      </div>
+      {weatherData && (
+        <div className="block">
+          <div className="weather-info">
+            <div className="city-details">
+              <img
+                className="weather-icon"
+                src={`http://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`}
+                alt="Weather Icon"
+              />
+              <div>
+                <h3>
+                  {weatherData.name}
+                  <span className="weather-temp">{weatherData.main.temp}°C</span>
+                </h3>
+                <h5>
+                  Min: {weatherData.main.temp_min}°C | Max: {weatherData.main.temp_max}°C
+                </h5>
+                <p>Humedad: {weatherData.main.humidity}%</p>
+                <p>Punto de Rocío: {weatherData.main.dew_point}°C</p>
+                <p>Presión Atmosférica: {weatherData.main.pressure} hPa</p>
+                <p>Dirección del Viento: {weatherData.wind.deg}°</p>
+                <p>Intensidad del Viento: {weatherData.wind.speed} m/s</p>
+              </div>
+            </div>
+            <div className="weather-map">
+              <iframe
+                title="Weather Map"
+                width="600"
+                height="450"
+                src={`https://embed.windy.com/embed2.html?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&zoom=10&level=surface&overlay=clouds&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&detailLat=${weatherData.coord.lat}&detailLon=${weatherData.coord.lon}&metricWind=default&metricTemp=default&radarRange=-1`}
+                frameborder="0"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+      {forecastData && (
+        <div className="block">
+          <div className="weather-forecast-horizontal">
+            {getFutureDaysForecast().map((forecast) => (
+              <div className="forecast-item" key={forecast.dt}>
+                <div className="forecast-day">
+                  <h4>{getDayOfWeek(forecast.dt)}</h4>
+                  <p>{formatDate(forecast.dt)}</p>
+                </div>
+                <div className="forecast-info">
+                  <img
+                    className="weather-icon-small"
+                    src={`http://openweathermap.org/img/w/${forecast.weather[0].icon}.png`}
+                    alt="Weather Icon"
+                  />
+                  <p>
+                    Min: {forecast.main.temp_min}°C | Max: {forecast.main.temp_max}°C
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
